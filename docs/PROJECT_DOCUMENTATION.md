@@ -69,7 +69,20 @@ When the notebook runs, it calculates and writes `outputs/KEY_FINDINGS.md`. The 
 
 This design keeps numerical claims tied to the dataset run rather than inserting unverified values into documentation. Refresh the report by executing the notebook after any data or cleaning change.
 
-## 7. Business interpretation framework
+## 7. Business impact and operational KPIs
+
+The generated findings report includes borough-level trip counts, trip share, total fare, fare share, average/median fare, average distance and average tip, plus payment-method trip counts and fare/tip summaries. These measures support more careful comparisons than total fare alone.
+
+Potential operational applications include:
+- **Fleet planning:** compare trip share and fare share to identify areas for further demand and supply investigation.
+- **Fare review:** inspect distance/fare outliers and validate them against applicable fare rules and trip context.
+- **Payment operations:** monitor recorded payment mix after checking unknown or missing payment data.
+- **Service quality:** compare tip and fare distributions using medians and spread, not only averages.
+- **Management reporting:** track trip volume, total fare and fare per trip together.
+
+The dataset does not provide enough evidence to quantify profit, vehicle utilization, wait time, driver supply, cost savings or causal impact. Treat these as questions for follow-up analysis, not proven business outcomes.
+
+## 8. Business interpretation framework
 
 When presenting the results:
 - Compare total fare with trip count; a larger total may reflect more trips rather than higher fares per trip.
