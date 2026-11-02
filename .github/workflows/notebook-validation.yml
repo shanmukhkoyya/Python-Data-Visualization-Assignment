@@ -63,14 +63,16 @@ jobs:
               "08_numeric_correlation_heatmap.png",
               "09_pickup_zone_pair_plot.png",
               "10_fare_by_payment_method_violin_plot.png",
+              "KEY_FINDINGS.md",
           ]
           folder = Path("outputs")
           for name in expected:
               path = folder / name
               if not path.is_file() or path.stat().st_size < 1000:
                   raise SystemExit(f"Missing or invalid chart: {name}")
-              with Image.open(path) as image:
-                  image.verify()
+              if path.suffix == ".png":
+                  with Image.open(path) as image:
+                      image.verify()
           print(f"Verified {len(expected)} generated PNG charts.")
           PY
       - name: Commit regenerated chart images
