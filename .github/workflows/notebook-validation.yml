@@ -85,5 +85,6 @@ jobs:
             echo "Generated chart images are already up to date."
           else
             git commit -m "Regenerate notebook visualization outputs"
+            git pull --rebase origin main
             git push
           fi
