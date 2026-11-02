@@ -44,7 +44,7 @@ jobs:
           PY
       - name: Execute notebook and regenerate all chart images
         run: |
-          jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_visualization_assignment.ipynb --ExecutePreprocessor.timeout=600
+          jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_visualization_assignment.ipynb --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.cwd=notebooks
           git checkout -- notebooks/01_data_visualization_assignment.ipynb
       - name: Verify all expected chart files
         run: |
