@@ -1,33 +1,87 @@
-name: Notebook validation
+name: Notebook validation and chart regeneration
 
 on:
   push:
     branches: [main]
+    paths:
+      - "notebooks/01_data_visualization_assignment.ipynb"
+      - "requirements.txt"
+      - ".github/workflows/notebook-validation.yml"
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
-  validate:
+  validate-and-regenerate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install notebook validator
-        run: python -m pip install nbformat
-      - name: Validate notebook and Python syntax
+          cache: pip
+      - name: Install project dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt nbconvert
+      - name: Validate notebook structure and Python syntax
         run: |
           python - <<'PY'
           import ast
           import nbformat
-          from pathlib import Path
-
-          path = Path("notebooks/01_data_visualization_assignment.ipynb")
-          notebook = nbformat.read(path, as_version=4)
+          notebook = nbformat.read("notebooks/01_data_visualization_assignment.ipynb", as_version=4)
           nbformat.validate(notebook)
-          cells = [c.source for c in notebook.cells if c.cell_type == "code"]
-          for index, source in enumerate(cells, 1):
+          code = [cell.source for cell in notebook.cells if cell.cell_type == "code"]
+          for index, source in enumerate(code, 1):
               ast.parse(source, filename=f"code_cell_{index}")
-          print(f"Validated {len(notebook.cells)} cells and {len(cells)} code cells.")
+          print(f"Validated {len(notebook.cells)} cells and {len(code)} code cells.")
           PY
+      - name: Execute notebook and regenerate all chart images
+        run: |
+          jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_visualization_assignment.ipynb --ExecutePreprocessor.timeout=600
+          git checkout -- notebooks/01_data_visualization_assignment.ipynb
+      - name: Verify all expected chart files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          expected = [
+              "00_missing_values_heatmap.png",
+              "01_fare_over_time_line_chart.png",
+              "02_total_fare_by_borough_bar_chart.png",
+              "03_payment_method_pie_chart.png",
+              "04_trip_distance_histogram.png",
+              "05_tip_by_borough_box_plot.png",
+              "06_trips_by_borough_count_plot.png",
+              "07_distance_vs_fare_scatter_plot.png",
+              "08_numeric_correlation_heatmap.png",
+              "09_pickup_zone_pair_plot.png",
+              "10_fare_by_payment_method_violin_plot.png",
+          ]
+          folder = Path("outputs")
+          for name in expected:
+              path = folder / name
+              if not path.is_file() or path.stat().st_size < 1000:
+                  raise SystemExit(f"Missing or invalid chart: {name}")
+              with Image.open(path) as image:
+                  image.verify()
+          print(f"Verified {len(expected)} generated PNG charts.")
+          PY
+      - name: Commit regenerated chart images
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add outputs/*.png
+          if git diff --cached --quiet; then
+            echo "Generated chart images are already up to date."
+          else
+            git commit -m "Regenerate notebook visualization outputs"
+            git push
+          fi
