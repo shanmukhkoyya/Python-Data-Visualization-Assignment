@@ -80,7 +80,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add outputs/*.png
+          git add outputs/*.png outputs/KEY_FINDINGS.md
           if git diff --cached --quiet; then
             echo "Generated chart images are already up to date."
           else
