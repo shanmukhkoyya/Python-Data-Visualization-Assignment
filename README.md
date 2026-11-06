@@ -71,6 +71,18 @@ Run the notebook from top to bottom to calculate current findings and create **[
 
 The figures and report are data-derived at execution time. Avoid copying figures from an old run without regenerating the notebook.
 
+## Business recommendations and next steps
+
+The cleaned sample covers 6,433 trips across four pickup-borough categories from 2019-02-28 to 2019-03-31. Manhattan has the highest total fare in this sample ($59,426.42), 71.8% of trips with a recorded payment method use credit card, and the distance–fare correlation is 0.92. These are sample-level descriptive findings, not live operating conditions.
+
+1. **Study location and time together before fleet planning.** Compare trip share, fare share and time-of-day patterns by borough or pickup zone. Validate any proposed vehicle or driver allocation with current demand, driver supply, wait times and operating costs.
+2. **Investigate unusual fare records.** Use distance, tolls and trip context to review outliers, then check applicable fare rules and surcharges before considering a pricing or billing action.
+3. **Monitor payment-data quality.** Use the recorded payment mix as a starting point for payment-system reporting, but review missing and unknown payment records before using percentages for finance decisions.
+4. **Report volume and value together.** Track trip count, trip share, total fare, fare share and fare per trip. Use medians and distributions alongside averages so a few unusual trips do not dominate the story.
+5. **Extend the analysis carefully.** Add weekday/weekend and time-of-day comparisons, then refresh the dataset and generated findings before presenting current operational recommendations.
+
+**Decision boundary:** this dataset does not provide profit, driver supply, vehicle utilisation or wait-time measures. The analysis cannot prove that changing fleet allocation or fares would increase revenue or reduce cost. See [generated key findings and the detailed action notes](outputs/KEY_FINDINGS.md).
+
 ## Tools and skills demonstrated
 
 - **Python:** reusable analysis workflow and notebook execution
